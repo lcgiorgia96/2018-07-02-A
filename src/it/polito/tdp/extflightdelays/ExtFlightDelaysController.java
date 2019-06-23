@@ -7,8 +7,10 @@
 package it.polito.tdp.extflightdelays;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.extflightdelays.model.Airport;
 import it.polito.tdp.extflightdelays.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,7 +39,7 @@ public class ExtFlightDelaysController {
     private Button btnAnalizza; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxAeroportoPartenza"
-    private ComboBox<?> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
+    private ComboBox<Airport> cmbBoxAeroportoPartenza; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAeroportiConnessi"
     private Button btnAeroportiConnessi; // Value injected by FXMLLoader
@@ -51,16 +53,86 @@ public class ExtFlightDelaysController {
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
 
+    	txtResult.clear();
+    	cmbBoxAeroportoPartenza.getItems().clear();
+    	
+    	try {
+    		
+    		int x = Integer.parseInt(distanzaMinima.getText());
+    		
+    		this.model.creaGrafo(x);
+    		
+    		List<Airport> aeroporti = this.model.getAeroporti();
+    		
+    		cmbBoxAeroportoPartenza.getItems().addAll(aeroporti);
+    		
+    		
+	} 
+    	catch (NumberFormatException e ) {
+    		txtResult.appendText("Inserire un numero nel formato corretto");
+    	} 
+    	catch( RuntimeException e ) 
+    	{
+    		txtResult.appendText("\nERRORE");
+    	}
     }
 
     @FXML
     void doCalcolaAeroportiConnessi(ActionEvent event) {
-
+    	txtResult.clear();
+    	try {
+    		
+    		Airport a = cmbBoxAeroportoPartenza.getValue();
+    		
+    		if (a == null) {
+    			txtResult.appendText("Seleziona un aeroporto!");
+    		}
+    		
+    		List<Airport> connessi = this.model.getConnessi(a);
+    		
+    		for (Airport a1: connessi) {
+    			txtResult.appendText(a1+"\n");
+    		}
+    		
+    	} catch (RuntimeException e) {
+    		txtResult.appendText("ERRORE");
+    	}
     }
 
     @FXML
     void doCercaItinerario(ActionEvent event) {
 
+ 
+    	try {
+    		 
+    		int miglia = Integer.parseInt(numeroVoliTxtInput.getText());
+    		Airport a = cmbBoxAeroportoPartenza.getValue();
+    		
+    		if (numeroVoliTxtInput.getText()=="") {
+    			txtResult.appendText("Inserire un numero");
+    		}
+    		
+    		if (a==null) {
+    			txtResult.appendText("Selezionare un aeroporto");
+    		}
+    		
+    		txtResult.appendText("Percorso:\n");
+    		List<Airport> percorso = this.model.getPercorso(a,miglia);
+    		
+    		for (Airport a1: percorso) {
+    			txtResult.appendText(a1+"\n");
+    		}
+    		
+    		txtResult.appendText("\nTotMiglia:");
+    		txtResult.appendText("\n"+this.model.getTotMiglia());
+    			
+    		
+    		
+    	} catch (NumberFormatException e ) {
+    		txtResult.appendText("Inserire il numero nel formato corretto");
+    	} catch( RuntimeException e ) {
+    		txtResult.appendText("ERRORE");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
