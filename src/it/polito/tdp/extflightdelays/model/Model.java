@@ -50,7 +50,12 @@ public class Model {
 			Airport a1 = r.getA1();
 			Airport a2 = r.getA2();
 			int peso = r.getDistanza();
+			DefaultWeightedEdge edge = grafo.getEdge(a1, a2);
+			if (edge == null) {
 			Graphs.addEdgeWithVertices(this.grafo, a1, a2, peso);
+			} else {
+				grafo.setEdgeWeight(edge, (grafo.getEdgeWeight(edge)+peso)/2);
+			}
 		}
 		
 		System.out.println(grafo.edgeSet().size());
